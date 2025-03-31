@@ -3,12 +3,19 @@
 :- use_module(library(charsio)).
 :- use_module(library(lists)).
 :- use_module(library(clpz)).
+:- use_module(library(debug)).
 
-nquad_doc(Ls) --> statement
+nquad_doc --> optional(statement), chain_statement, optional(end_of_line) . 
+nquad_doc --> "".
 
+chain_statement --> end_of_line, statement, chain_statement.
+chain_statement --> "".
 
-statement(Value_subject, Value_predicate, Value_object) --> subject(Value_subject), space, predicate(Value_predicate), space, object(Value_object), space_or_not, "." . 
+statement --> statement(_Value_subject, _Value_predicate, _Value_object) | statement(_Value_subject, _Value_predicate, _Value_object, _Value_graph) .
+statement(Value_subject, Value_predicate, Value_object) --> subject(Value_subject), space, predicate(Value_predicate), space, object(Value_object), optional(space), "." . 
 statement(Value_subject, Value_predicate, Value_object, Value_graph) --> subject(Value_subject), space, predicate(Value_predicate), space, object(Value_object), space, graph_label(Value_graph), optional(space) , "." . 
+
+end_of_line --> "\n".
 
 space --> " " | "    ".
 
