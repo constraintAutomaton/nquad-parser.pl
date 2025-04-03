@@ -88,27 +88,3 @@ string_literal_quote([Value0|Value]) -->
     { char_type(Value0, alnum) },
     string_literal_quote(Value).
 string_literal_quote([]) --> [] .
-
-langtag([Langtag0|Langtag]) --> 
-    [Langtag0],
-    { char_type(Langtag0, alnum) },
-    label(Langtag).
-langtag([]) --> [] .
-
-/**
-character_between_hex(Char, MinHex, MaxHex) :- 
-    Code #>= MinHex, 
-    Code #=< MaxHex,
-    when(
-        (   nonvar(A)
-        ),
-        (   exec(A, B)
-        )
-    ),
-    atom_chars(AtomChar, Char),
-    char_code(AtomChar, Code).
-
-hex_to_number(Hex, Num) :- 
-    char_code(atom_chars(NumNonAtom), Hex),
-    atom_number(NumNonAtom, Num).
-*/

@@ -12,29 +12,48 @@ end_of_line --> end_of_line_ .
 end_of_line --> end_of_line_, end_of_line.
 
 space_ --> " " | "    ".
-speace_ --> "   ".
 space --> space_ .
 space --> space_, space.
 
 langtag --> "@", alphabetic_chain, optional(("-", alphanumeric_chain)) .
 
 
-alphabetic_chain_ --> [X], { from_char_to(X, 65, 90); from_char_to(X, 97, 122) } .
+alphabetic_chain_ --> 
+    [X], 
+    {
+        /*between a and z*/ 
+        unicode_char_between(X, 65, 90);
+        /*between A and Z*/
+        unicode_char_between(X, 97, 122) 
+    } .
 alphabetic_chain --> alphabetic_chain_ .
-alphabetic_chain --> alphabetic_chain_ , alphabetic_chain.
+alphabetic_chain --> 
+    alphabetic_chain_ ,
+    alphabetic_chain .
 
-alphanumeric_chain_ --> [X], { from_char_to(X, 65, 90); from_char_to(X, 97, 122); from_char_to(X, 48, 57)} .
+alphanumeric_chain_ --> 
+    [X],
+    { 
+        /*between a and z*/
+        unicode_char_between(X, 65, 90);
+        /*between A and Z*/
+        unicode_char_between(X, 97, 122);
+        /*between 0 and 9*/
+        unicode_char_between(X, 48, 57)
+    } .
 alphanumeric_chain --> alphanumeric_chain_ .
 alphanumeric_chain --> alphanumeric_chain_, alphanumeric_chain .
 
-from_char_to(Char, MinDec, MaxDec) :-
-    when(
-            (   
-                nonvar(Char)
-            ),
-            (      
-                X0 #>= MinDec,                   
-                X0 #=< MaxDec,
-                char_code(Char, X0)
-            )
-    ).
+uchar --> "\\u", hex, hex, hex, hex .
+uchar --> "\\U", hex, hex, hex, hex, hex, hex, hex .
+
+hex --> 
+    [X],
+    {
+        /*between 0 and 9*/
+        unicode_char_between(X, 48, 57);
+        /*between a and f*/
+        unicode_char_between(X, 97, 102);
+        /*between A and F*/
+        unicode_char_between(X, 65, 90)
+    } .

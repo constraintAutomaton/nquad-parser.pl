@@ -4,14 +4,14 @@ https://www.w3.org/TR/n-quads/
 
 https://www.w3.org/TR/REC-xml/#sec-notation
 
+https://www.w3.org/2013/N-QuadsReports/index.html
+
 ## todo list
 - [ ] Support correct IRI, and blank node.
 - [ ] Support all literals.
-- [ ] option to add triples has facts.
-- [ ] Option for valid IRI or not.
+- [ ] option to return a bag of triples.
 - [ ] Support comment .
 - [ ] Support for real IRI from the IRI specification.
-- [ ] Support Stream .
 - [ ] Document the project
 - [ ] Add a license
 
