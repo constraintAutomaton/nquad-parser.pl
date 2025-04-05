@@ -15,10 +15,10 @@ space_ --> " " | "    ".
 space --> space_ .
 space --> space_, space.
 
-langtag --> "@", alphabetic_chain, optional(("-", alphanumeric_chain)) .
+langtag --> "@", one_or_more(alphabetic_char), optional(("-", one_or_more(alphanumeric_char))) .
 
 
-alphabetic_chain_ --> 
+alphabetic_char --> 
     [X], 
     {
         /*between a and z*/ 
@@ -26,12 +26,9 @@ alphabetic_chain_ -->
         /*between A and Z*/
         unicode_char_between(X, 97, 122) 
     } .
-alphabetic_chain --> alphabetic_chain_ .
-alphabetic_chain --> 
-    alphabetic_chain_ ,
-    alphabetic_chain .
 
-alphanumeric_chain_ --> 
+
+alphanumeric_char --> 
     [X],
     { 
         /*between a and z*/
@@ -41,8 +38,7 @@ alphanumeric_chain_ -->
         /*between 0 and 9*/
         unicode_char_between(X, 48, 57)
     } .
-alphanumeric_chain --> alphanumeric_chain_ .
-alphanumeric_chain --> alphanumeric_chain_, alphanumeric_chain .
+
 
 uchar --> "\\u", hex, hex, hex, hex .
 uchar --> "\\U", hex, hex, hex, hex, hex, hex, hex .

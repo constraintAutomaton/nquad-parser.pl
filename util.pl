@@ -4,6 +4,8 @@
 optional(_) --> "".
 optional(X) --> X.
 
+one_or_more(X) --> X.
+one_or_more(X) --> X, one_or_more(X).
 
 unicode_char_between(Char, MinDec, MaxDec) :-
     when(
