@@ -2,7 +2,7 @@
 :- use_module(library(dcgs)).
 :- use_module(library(freeze)).
 
-optional(_) --> "".
+optional(_) --> [].
 optional(X) --> X.
 
 one_or_more(X) --> X.

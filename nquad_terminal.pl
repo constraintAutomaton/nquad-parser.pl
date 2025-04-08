@@ -17,6 +17,33 @@ space --> space_, space.
 
 langtag --> "@", one_or_more(alphabetic_char), optional(("-", one_or_more(alphanumeric_char))) .
 
+iri_label_ --> [X],
+    {
+        \+(
+        unicode_char_between(X, 0x00, 0x20);
+        unicode_char_between(X, 0x00, 0x20);
+        /*the < character */
+        unicode_char_between(X, 60, 60);
+        /*the > character */
+        unicode_char_between(X, 62, 62);
+        /*the " character */
+        unicode_char_between(X, 34, 34);
+        /*the { character */
+        unicode_char_between(X, 123, 123);
+        /*the } character */
+        unicode_char_between(X, 125, 125);
+        /*the | character */
+        unicode_char_between(X, 124, 124);
+        /*the ^ character */
+        unicode_char_between(X, 94, 94);
+        /*the ` character */
+        unicode_char_between(X, 96, 96);
+        /*the \ character */
+        unicode_char_between(X, 92, 92)
+        )
+    } .
+
+iri_label --> zero_or_more((uchar|iri_label_)) .
 
 alphabetic_char --> 
     [X], 
