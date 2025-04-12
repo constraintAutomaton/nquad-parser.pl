@@ -11,35 +11,58 @@ end_of_line_ --> "\n"|"\r" .
 end_of_line --> end_of_line_ .
 end_of_line --> end_of_line_, end_of_line.
 
-space_ --> " " | "    ".
+space_ --> [X], {char_type(X, whitespace)} .
 space --> space_ .
 space --> space_, space.
 
+blank_node_label --> "_:", (pn_chars_base_u | numeric_char), optional((zero_or_more((pn_chars|".")) | pn_chars)) .
+
 langtag --> "@", one_or_more(alphabetic_char), optional(("-", one_or_more(alphanumeric_char))) .
 
-iri_label_ --> [X],
+string_literal_quote --> ['"'], string_literal_quote_label, ['"'].
+
+string_literal_quote_label --> zero_or_more((string_literal_quote_label_ | echar | uchar )).
+
+string_literal_quote_label_ --> 
+    [X],
+    {
+        \+(
+            unicode_char(X, 0x22);
+            unicode_char(X, 0x5C);
+            unicode_char(X, 0xA);
+            unicode_char(X, 0xD)
+        )
+    } .
+
+iri_ref --> 
+    "<",
+    iri_label,
+    ">".
+    
+iri_label_ --> 
+    [X],
     {
         \+(
         unicode_char_between(X, 0x00, 0x20);
         unicode_char_between(X, 0x00, 0x20);
         /*the < character */
-        unicode_char_between(X, 60, 60);
+        unicode_char(X, 60);
         /*the > character */
-        unicode_char_between(X, 62, 62);
+        unicode_char(X, 62);
         /*the " character */
-        unicode_char_between(X, 34, 34);
+        unicode_char(X, 34);
         /*the { character */
-        unicode_char_between(X, 123, 123);
+        unicode_char(X, 123);
         /*the } character */
-        unicode_char_between(X, 125, 125);
+        unicode_char(X, 125);
         /*the | character */
-        unicode_char_between(X, 124, 124);
+        unicode_char(X, 124);
         /*the ^ character */
-        unicode_char_between(X, 94, 94);
+        unicode_char(X, 94);
         /*the ` character */
-        unicode_char_between(X, 96, 96);
+        unicode_char(X, 96);
         /*the \ character */
-        unicode_char_between(X, 92, 92)
+        unicode_char(X, 92)
         )
     } .
 
@@ -66,7 +89,12 @@ alphanumeric_char -->
         unicode_char_between(X, 48, 57)
     } .
 
-
+numeric_char --> 
+    [X],
+    {
+        /*between 0 and 9*/
+        unicode_char_between(X, 48, 57)
+    }.
 uchar --> "\\u", hex, hex, hex, hex .
 uchar --> "\\U", hex, hex, hex, hex, hex, hex, hex .
 
@@ -80,3 +108,40 @@ hex -->
         /*between A and F*/
         unicode_char_between(X, 65, 90)
     } .
+
+echar --> "\t".
+echar --> "\b".
+echar --> "\n".
+echar --> "\r".
+echar --> "\f".
+echar --> ['"'].
+echar --> "\'".
+echar --> "\\".
+
+pn_chars --> pn_chars_base_u | "-" .
+pn_chars --> numeric_char.
+pn_chars --> [X],
+    {
+        unicode_char(X, x00B7);
+        unicode_char_between(X, 0x0300, 0x036F);
+        unicode_char_between(X, 0x203F, 0x2040)
+    }.
+
+pn_chars_base_u --> pn_chars_base | "_" | ":" .
+
+pn_chars_base --> alphabetic_char .
+pn_chars_base --> [X],
+    {
+        unicode_char_between(X, 0x00C0, 0x00D6);
+        unicode_char_between(X, 0x00D8, 0x00F6);
+        unicode_char_between(X, 0x00F8, 0x02FF);
+        unicode_char_between(X, 0x0370, 0x037D);
+        unicode_char_between(X, 0x037F, 0x1FFF);
+        unicode_char_between(X, 0x200C, 0x200D);
+        unicode_char_between(X, 0x2070, 0x218F);
+        unicode_char_between(X, 0x2C00, 0x2FEF);
+        unicode_char_between(X, 0x3001, 0xD7FF);
+        unicode_char_between(X, 0xF900, 0xFDCF);
+        unicode_char_between(X, 0xFDF0, 0xFFFD);
+        unicode_char_between(X, 0x10000, 0xEFFFF)
+    }.
