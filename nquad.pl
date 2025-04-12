@@ -30,8 +30,10 @@ graph_label --> iri_ref | blank_node_label .
 literal --> string_literal_quote, optional(("^^", (iri_ref | langtag))) .
 
 comment --> 
-    "#",
-    [X],
+    "#", zero_or_more(comment_).
+    
+
+comment_ --> [X],
     {
         \+(
             X = '\n';
