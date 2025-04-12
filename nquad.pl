@@ -19,7 +19,6 @@ statement -->
     optional(space),
     optional(comment) .
 
-statement_no_dot -->
 subject --> iri_ref | blank_node_label .
 
 predicate --> iri_ref .
@@ -28,7 +27,7 @@ object --> iri_ref | blank_node_label | literal .
 
 graph_label --> iri_ref | blank_node_label .
 
-literal --> string_literal_quote, optional(("^^", (iri_ref | langtag)).
+literal --> string_literal_quote, optional(("^^", (iri_ref | langtag))) .
 
 comment --> 
     "#",
