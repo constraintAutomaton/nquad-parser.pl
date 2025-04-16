@@ -116,13 +116,13 @@ echar --> "\r".
 echar --> "\f".
 echar --> ['"'].
 echar --> "\'".
-echar --> "\\".
+echar --> ['\\'].
 
 pn_chars --> pn_chars_base_u | "-" .
 pn_chars --> numeric_char.
 pn_chars --> [X],
     {
-        unicode_char(X, x00B7);
+        unicode_char(X, 0x00B7);
         unicode_char_between(X, 0x0300, 0x036F);
         unicode_char_between(X, 0x203F, 0x2040)
     }.

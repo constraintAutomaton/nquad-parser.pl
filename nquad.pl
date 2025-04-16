@@ -3,8 +3,9 @@
 :- use_module(library(debug)).
 :- use_module('./nquad_terminal.pl').
 :- use_module('./util.pl').
+:- use_module(library(pio)).
 
-nquad_doc --> optional(statement), zero_or_more((end_of_line, statement)), optional(end_of_line).
+nquad_doc --> optional(statement), zero_or_more((end_of_line, (statement | comment))), optional(end_of_line).
 
 statement --> 
     subject,
@@ -17,7 +18,7 @@ statement -->
     optional(space),
     ".",
     optional(space),
-    optional(comment) .
+    optional(comment).
 
 subject --> iri_ref | blank_node_label .
 
@@ -27,7 +28,7 @@ object --> iri_ref | blank_node_label | literal .
 
 graph_label --> iri_ref | blank_node_label .
 
-literal --> string_literal_quote, optional(("^^", (iri_ref | langtag))) .
+literal --> string_literal_quote, optional((("^^", iri_ref)| langtag)) .
 
 comment --> 
     "#", zero_or_more(comment_).
