@@ -1,1 +1,1 @@
-/home/cactus/Documents/coding/prolog_turtle_parser/w3c_test_suite/manifest.ttl
+../w3c_test_suite/manifest.ttl
