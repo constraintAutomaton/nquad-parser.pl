@@ -14,5 +14,7 @@ https://www.w3.org/2013/N-QuadsReports/index.html
 - [ ] Implement test using the w3c test suite.
 - [ ] Document the project
 - [ ] Add a license
+- [ ] Test the implementation with trella prolog
+- [ ] Test the implementation with swi prolog
 
 

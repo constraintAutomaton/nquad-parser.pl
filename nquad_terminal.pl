@@ -4,7 +4,6 @@
 :- use_module(library(lists)).
 :- use_module(library(clpz)).
 :- use_module(library(debug)).
-:- use_module(library(when)).
 :- use_module('./util.pl').
 
 end_of_line_ --> "\n"|"\r" .
@@ -43,7 +42,6 @@ iri_label_ -->
     [X],
     {
         \+(
-        unicode_char_between(X, 0x00, 0x20);
         unicode_char_between(X, 0x00, 0x20);
         /*the < character */
         unicode_char(X, 60);
