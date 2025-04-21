@@ -16,5 +16,6 @@ https://www.w3.org/2013/N-QuadsReports/index.html
 - [ ] Add a license
 - [ ] Test the implementation with trella prolog
 - [ ] Test the implementation with swi prolog
+- [ ] Test the implementation with tau prolog
 
 

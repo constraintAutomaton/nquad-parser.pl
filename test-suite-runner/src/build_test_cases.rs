@@ -52,7 +52,7 @@ SELECT ?positiveTestFile ?negativeTestFile ?name WHERE{
     ?s mf:entries ?entries.
     ?entries rdf:rest*/rdf:first ?entry.
     {
-    ?entry a rdft:TestNQuadsPositiveSyntax;
+        ?entry a rdft:TestNQuadsPositiveSyntax;
         mf:action ?positiveTestFile ;
         mf:name ?name .
 
