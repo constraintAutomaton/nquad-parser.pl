@@ -3,6 +3,7 @@ use std::{error::Error, path::PathBuf};
 
 use crate::build_test_cases::BASE_IRI;
 
+
 #[derive(Debug)]
 pub struct PrologError {
     pub message: String,
@@ -15,15 +16,18 @@ impl std::fmt::Display for PrologError {
         write!(f, "{}", self.message)
     }
 }
+#[derive(Clone)]
 pub struct Command {
     pub program: String,
     pub arguments: [String; 3],
 }
+#[derive(Clone)]
 pub struct TestSuite {
     positive_tests: Vec<TestCase>,
     negative_tests: Vec<TestCase>,
 }
 
+#[derive(Clone)]
 pub struct TestCase {
     pub name: String,
     pub path: PathBuf,

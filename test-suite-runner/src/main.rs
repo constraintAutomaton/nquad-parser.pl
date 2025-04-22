@@ -2,13 +2,16 @@ use build_test_cases::get_test_suite;
 use domain::*;
 use std::collections::HashMap;
 use std::error::Error;
+use std::fs::File;
+use std::io::prelude::*;
 use std::process;
+use std::sync::Arc;
+use std::thread;
 mod build_test_cases;
 mod domain;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut test_suite_result: HashMap<String, bool> = HashMap::new();
-    let scryer_command: Command = Command {
+    let scryer_command: Arc<Command> = Arc::new(Command {
         program: "scryer-prolog".into(),
         arguments: [
             "-g".into(),
@@ -20,31 +23,47 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .into(),
             "./prolog/nquad.pl".into(),
         ],
-    };
+    });
 
     let test_suite = get_test_suite()?;
-
-    for positive_test in test_suite.positive_tests() {
-        let res = run_test(positive_test, &scryer_command);
-        if let Ok(success) = res {
-            test_suite_result.insert(positive_test.name.clone(), success);
-            println!("{success}");
-        } else if let Err(err) = res {
-            test_suite_result.insert(positive_test.name.clone(), false);
-            println!("{}", err);
-        }
+    let mut threads = Vec::new();
+    for positive_test in test_suite.positive_tests().clone() {
+        let command_to_thread = scryer_command.clone();
+        let thread_join_handle = thread::spawn(move || {
+            let res = run_test(&positive_test, command_to_thread.as_ref());
+            if let Ok(success) = res {
+                println!("{} - {success}", positive_test.name);
+                (positive_test.name, success)
+            } else {
+                println!("{}", res.unwrap_err());
+                (positive_test.name, false)
+            }
+        });
+        threads.push(thread_join_handle);
     }
 
-    for negative_test in test_suite.negative_tests() {
-        let res = run_test(negative_test, &scryer_command);
-        if let Ok(failure) = res {
-            test_suite_result.insert(negative_test.name.clone(), !failure);
-            println!("{}", !failure);
-        } else if let Err(err) = res {
-            test_suite_result.insert(negative_test.name.clone(), false);
-            println!("{}", err);
-        }
+    for negative_test in test_suite.negative_tests().clone() {
+        let command_to_thread = scryer_command.clone();
+        let thread_join_handle = thread::spawn(move || {
+            let res = run_test(&negative_test, command_to_thread.as_ref());
+            if let Ok(failure) = res {
+                println!("{} - {}", negative_test.name, !failure);
+                (negative_test.name, !failure)
+            } else {
+                println!("{} - {}", negative_test.name, res.unwrap_err());
+                (negative_test.name, false)
+            }
+        });
+        threads.push(thread_join_handle);
     }
+
+    let test_suite_result: HashMap<String, bool> =
+        threads.into_iter().map(|t| t.join().unwrap()).collect();
+
+    let json = serde_json::to_string(&test_suite_result).unwrap();
+
+    let mut file = File::create("./test_result.json")?;
+    file.write_all(json.as_bytes())?;
 
     Ok(())
 }
