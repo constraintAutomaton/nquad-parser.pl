@@ -5,13 +5,11 @@ use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::process;
-use std::sync::Arc;
-use std::thread;
 mod build_test_cases;
 mod domain;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let scryer_command: Arc<Command> = Arc::new(Command {
+    let scryer_command: Command = Command {
         program: "scryer-prolog".into(),
         arguments: [
             "-g".into(),
@@ -23,67 +21,55 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .into(),
             "./prolog/nquad.pl".into(),
         ],
-    });
+    };
+    let mut test_suite_result: HashMap<String, TestResponse> = HashMap::new();
 
     let test_suite = get_test_suite()?;
-    let mut threads = Vec::new();
     for positive_test in test_suite.positive_tests().clone() {
-        let command_to_thread = scryer_command.clone();
-        let thread_join_handle = thread::spawn(move || {
-            let res = run_test(&positive_test, command_to_thread.as_ref());
-            if let Ok(success) = res {
-                println!("{} - {success}", positive_test.name);
-                (
-                    positive_test.name,
-                    TestResponse {
-                        response: success,
-                        test_path: positive_test.path,
-                    },
-                )
-            } else {
-                println!("{}", res.unwrap_err());
-                (
-                    positive_test.name,
-                    TestResponse {
-                        response: false,
-                        test_path: positive_test.path,
-                    },
-                )
-            }
-        });
-        threads.push(thread_join_handle);
+        let res = run_test(&positive_test, &scryer_command);
+        if let Ok(success) = res {
+            println!("{} - {success}", positive_test.name);
+            test_suite_result.insert(
+                positive_test.name,
+                TestResponse {
+                    response: success,
+                    test_path: positive_test.path,
+                },
+            );
+        } else {
+            println!("{}", res.unwrap_err());
+            test_suite_result.insert(
+                positive_test.name,
+                TestResponse {
+                    response: false,
+                    test_path: positive_test.path,
+                },
+            );
+        }
     }
 
     for negative_test in test_suite.negative_tests().clone() {
-        let command_to_thread = scryer_command.clone();
-        let thread_join_handle = thread::spawn(move || {
-            let res = run_test(&negative_test, command_to_thread.as_ref());
-            if let Ok(failure) = res {
-                println!("{} - {}", negative_test.name, !failure);
-                (
-                    negative_test.name,
-                    TestResponse {
-                        response: !failure,
-                        test_path: negative_test.path,
-                    },
-                )
-            } else {
-                println!("{} - {}", negative_test.name, res.unwrap_err());
-                (
-                    negative_test.name,
-                    TestResponse {
-                        response: false,
-                        test_path: negative_test.path,
-                    },
-                )
-            }
-        });
-        threads.push(thread_join_handle);
+        let res = run_test(&negative_test, &scryer_command);
+        if let Ok(failure) = res {
+            println!("{} - {}", negative_test.name, !failure);
+            test_suite_result.insert(
+                negative_test.name,
+                TestResponse {
+                    response: !failure,
+                    test_path: negative_test.path,
+                },
+            );
+        } else {
+            println!("{} - {}", negative_test.name, res.unwrap_err());
+            test_suite_result.insert(
+                negative_test.name,
+                TestResponse {
+                    response: false,
+                    test_path: negative_test.path,
+                },
+            );
+        }
     }
-
-    let test_suite_result: HashMap<String, TestResponse> =
-        threads.into_iter().map(|t| t.join().unwrap()).collect();
-
     let json = serde_json::to_string_pretty(&test_suite_result).unwrap();
 
     let mut file = File::create("./test_result.json")?;
