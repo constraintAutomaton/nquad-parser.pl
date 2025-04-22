@@ -33,10 +33,22 @@ fn main() -> Result<(), Box<dyn Error>> {
             let res = run_test(&positive_test, command_to_thread.as_ref());
             if let Ok(success) = res {
                 println!("{} - {success}", positive_test.name);
-                (positive_test.name, success)
+                (
+                    positive_test.name,
+                    TestResponse {
+                        response: success,
+                        test_path: positive_test.path,
+                    },
+                )
             } else {
                 println!("{}", res.unwrap_err());
-                (positive_test.name, false)
+                (
+                    positive_test.name,
+                    TestResponse {
+                        response: false,
+                        test_path: positive_test.path,
+                    },
+                )
             }
         });
         threads.push(thread_join_handle);
@@ -48,16 +60,28 @@ fn main() -> Result<(), Box<dyn Error>> {
             let res = run_test(&negative_test, command_to_thread.as_ref());
             if let Ok(failure) = res {
                 println!("{} - {}", negative_test.name, !failure);
-                (negative_test.name, !failure)
+                (
+                    negative_test.name,
+                    TestResponse {
+                        response: !failure,
+                        test_path: negative_test.path,
+                    },
+                )
             } else {
                 println!("{} - {}", negative_test.name, res.unwrap_err());
-                (negative_test.name, false)
+                (
+                    negative_test.name,
+                    TestResponse {
+                        response: false,
+                        test_path: negative_test.path,
+                    },
+                )
             }
         });
         threads.push(thread_join_handle);
     }
 
-    let test_suite_result: HashMap<String, bool> =
+    let test_suite_result: HashMap<String, TestResponse> =
         threads.into_iter().map(|t| t.join().unwrap()).collect();
 
     let json = serde_json::to_string_pretty(&test_suite_result).unwrap();

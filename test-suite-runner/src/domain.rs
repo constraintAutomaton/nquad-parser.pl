@@ -1,8 +1,13 @@
+use crate::build_test_cases::BASE_IRI;
 use oxigraph::model::Term;
+use serde::Serialize;
 use std::{error::Error, path::PathBuf};
 
-use crate::build_test_cases::BASE_IRI;
-
+#[derive(Serialize)]
+pub struct TestResponse {
+    pub response: bool,
+    pub test_path: PathBuf,
+}
 
 #[derive(Debug)]
 pub struct PrologError {
