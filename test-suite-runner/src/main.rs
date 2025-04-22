@@ -60,7 +60,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let test_suite_result: HashMap<String, bool> =
         threads.into_iter().map(|t| t.join().unwrap()).collect();
 
-    let json = serde_json::to_string(&test_suite_result).unwrap();
+    let json = serde_json::to_string_pretty(&test_suite_result).unwrap();
 
     let mut file = File::create("./test_result.json")?;
     file.write_all(json.as_bytes())?;
