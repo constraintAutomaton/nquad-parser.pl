@@ -21,6 +21,7 @@ langtag --> "@", one_or_more(alphabetic_char), optional(("-", one_or_more(alphan
 
 string_literal_quote --> ['"'], string_literal_quote_label, ['"'].
 
+% might be the cause of duplicate results
 string_literal_quote_label --> zero_or_more((string_literal_quote_label_ | echar | uchar )).
 
 string_literal_quote_label_ --> 
