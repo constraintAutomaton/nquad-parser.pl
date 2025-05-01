@@ -23,6 +23,7 @@ string_literal_quote --> ['"'], string_literal_quote_label, ['"'].
 
 % might be the cause of duplicate results
 string_literal_quote_label --> zero_or_more((string_literal_quote_label_ | echar | uchar )).
+% string_literal_quote_label --> zero_or_more(string_literal_quote_label_) | zero_or_more(echar) | zero_or_more(uchar).
 
 string_literal_quote_label_ --> 
     [X],
@@ -31,8 +32,9 @@ string_literal_quote_label_ -->
             unicode_char(X, 0x22),
             unicode_char(X, 0x5C),
             unicode_char(X, 0xA),
-            unicode_char(X, 0xD)
-        ])       
+            unicode_char(X, 0xD),
+            '\\'
+        ])  
     } .
 
 iri_ref --> 
@@ -95,8 +97,8 @@ numeric_char -->
         /*between 0 and 9*/
         unicode_char_between(X, 48, 57)
     }.
-uchar --> "\\u", hex, hex, hex, hex .
-uchar --> "\\U", hex, hex, hex, hex, hex, hex, hex .
+uchar --> ['\\', 'u'], hex, hex, hex, hex .
+uchar --> ['\\', 'U'], hex, hex, hex, hex, hex, hex, hex .
 
 hex --> 
     [X],

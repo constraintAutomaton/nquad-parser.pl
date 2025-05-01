@@ -1,0 +1,3 @@
+[submodule "test-suite-runner/pkg.pl"]
+	path = test-suite-runner/package_manager
+	url = https://github.com/bakaq/pkg.pl.git

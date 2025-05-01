@@ -5,7 +5,7 @@
 :- use_module('./nquad_terminal.pl').
 :- use_module('./util.pl').
 
-nquad_doc --> optional(statement), zero_or_more((end_of_line, (statement | comment))), optional(end_of_line).
+nquad_doc --> optional(statement), optional(comment), zero_or_more((end_of_line, (statement | comment))), optional(end_of_line).
 
 statement --> 
     subject,
