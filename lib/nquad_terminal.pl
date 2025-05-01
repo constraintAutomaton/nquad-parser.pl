@@ -22,8 +22,7 @@ langtag --> "@", one_or_more(alphabetic_char), optional(("-", one_or_more(alphan
 string_literal_quote --> ['"'], string_literal_quote_label, ['"'].
 
 % might be the cause of duplicate results
-string_literal_quote_label --> zero_or_more((string_literal_quote_label_ | echar | uchar )).
-% string_literal_quote_label --> zero_or_more(string_literal_quote_label_) | zero_or_more(echar) | zero_or_more(uchar).
+string_literal_quote_label --> zero_or_more((string_literal_quote_label_ | uchar | echar )).
 
 string_literal_quote_label_ --> 
     [X],
@@ -33,6 +32,7 @@ string_literal_quote_label_ -->
             unicode_char(X, 0x5C),
             unicode_char(X, 0xA),
             unicode_char(X, 0xD),
+            '"',
             '\\'
         ])  
     } .
@@ -97,8 +97,8 @@ numeric_char -->
         /*between 0 and 9*/
         unicode_char_between(X, 48, 57)
     }.
-uchar --> ['\\', 'u'], hex, hex, hex, hex .
-uchar --> ['\\', 'U'], hex, hex, hex, hex, hex, hex, hex .
+uchar --> "\\\\u", hex, hex, hex, hex .
+uchar --> "\\\\U", hex, hex, hex, hex, hex, hex, hex .
 
 hex --> 
     [X],
@@ -111,14 +111,7 @@ hex -->
         unicode_char_between(X, 65, 90)
     } .
 
-echar --> "\t".
-echar --> "\b".
-echar --> "\n".
-echar --> "\r".
-echar --> "\f".
-echar --> ['"'].
-echar --> "\'".
-echar --> ['\\'].
+echar --> "\t" | "\b" | "\n" | "\r" | "\f" | "\\\"" | "\'" | ['\\'].
 
 pn_chars --> pn_chars_base_u | "-" .
 pn_chars --> numeric_char.
