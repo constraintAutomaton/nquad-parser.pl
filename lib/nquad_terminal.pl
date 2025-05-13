@@ -15,12 +15,14 @@ space_ --> [X], {char_type(X, whitespace)} .
 space --> space_ .
 space --> space_, space.
 
-blank_node_label --> "_:", (pn_chars_base_u | numeric_char), optional((zero_or_more((pn_chars|".")) | pn_chars)) .
 
 langtag --> "@", one_or_more(alphabetic_char), optional(("-", one_or_more(alphanumeric_char))) .
 
-string_literal_quote --> ['"'], string_literal_quote_label, ['"'].
-
+comment_ --> [X],
+    {
+        maplist(dif(X), ['\n', \r])
+    }.
+    
 % might be the cause of duplicate results, uchar must be
 string_literal_quote_label --> zero_or_more((uchar | string_literal_quote_label_ | echar)).
 
@@ -29,10 +31,7 @@ string_literal_quote_label --> zero_or_more((uchar | string_literal_quote_label_
 %string_literal_quote_label --> zero_or_more(echar).
 
 
-iri_ref --> 
-    "<",
-    iri_label,
-    ">".
+
     
 iri_label_ --> 
     [X],

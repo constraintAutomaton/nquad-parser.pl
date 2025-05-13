@@ -4,37 +4,46 @@
 :- use_module(library(dif)).
 :- use_module('./nquad_terminal.pl').
 :- use_module('./util.pl').
+:- use_module(library(reif)).
 
-nquad_doc --> optional(statement), optional(comment), zero_or_more((end_of_line, (statement | comment))), optional(end_of_line).
+quad(_, _, _, _).
+triple(S, P, O) :- quad(S, P, O, default_graph).
 
-statement --> 
-    subject,
+nquad_doc --> optional(statement(T)), optional(comment), zero_or_more((end_of_line, (statement | comment))), optional(end_of_line).
+
+statement(T) --> 
+    subject(S),
     optional(space),
-    predicate,
+    predicate(P),
     optional(space),
-    object,
+    object(O),
     optional(space),
-    optional(graph_label),
+    optional(graph_label(G)),
     optional(space),
     ".",
     optional(space),
-    optional(comment).
-
-subject --> iri_ref | blank_node_label .
-
-predicate --> iri_ref .
-
-object --> iri_ref | blank_node_label | literal .
-
-graph_label --> iri_ref | blank_node_label .
-
-literal --> string_literal_quote, optional((("^^", iri_ref)| langtag)) .
-
-comment --> 
-    "#", zero_or_more(comment_).
-    
-
-comment_ --> [X],
+    optional(comment),
     {
-        maplist(dif(X), ['\n', \r])
+        if_(var(G), T=triple(S, P, O), T=quad(S, P, O, G))
     }.
+
+subject(X) --> iri_ref(X) | blank_node_label(X) .
+
+predicate(X) --> iri_ref(X) .
+
+object(X) --> iri_ref(X) | blank_node_label(X) | literal(X) .
+
+graph_label(X) --> iri_ref(X) | blank_node_label(X) .
+
+literal(X) --> string_literal_quote(X).
+
+comment(X) --> "#", [X].
+    
+iri_ref(X) --> 
+    "<",
+    [X],
+    ">".
+
+blank_node_label(X) --> "_:", [X] .
+
+string_literal_quote(X) --> ['"'], [X], ['"'].
