@@ -21,21 +21,13 @@ langtag --> "@", one_or_more(alphabetic_char), optional(("-", one_or_more(alphan
 
 string_literal_quote --> ['"'], string_literal_quote_label, ['"'].
 
-% might be the cause of duplicate results
-string_literal_quote_label --> zero_or_more((string_literal_quote_label_ | uchar | echar )).
+% might be the cause of duplicate results, uchar must be
+string_literal_quote_label --> zero_or_more((uchar | string_literal_quote_label_ | echar)).
 
-string_literal_quote_label_ --> 
-    [X],
-    {
-        maplist(dif(X), [
-            unicode_char(X, 0x22),
-            unicode_char(X, 0x5C),
-            unicode_char(X, 0xA),
-            unicode_char(X, 0xD),
-            '"',
-            '\\'
-        ])  
-    } .
+%string_literal_quote_label --> zero_or_more(string_literal_quote_label_).
+%string_literal_quote_label --> zero_or_more(uchar).
+%string_literal_quote_label --> zero_or_more(echar).
+
 
 iri_ref --> 
     "<",
@@ -97,8 +89,7 @@ numeric_char -->
         /*between 0 and 9*/
         unicode_char_between(X, 48, 57)
     }.
-uchar --> "\\\\u", hex, hex, hex, hex .
-uchar --> "\\\\U", hex, hex, hex, hex, hex, hex, hex .
+
 
 hex --> 
     [X],
@@ -111,8 +102,27 @@ hex -->
         unicode_char_between(X, 65, 90)
     } .
 
-echar --> "\t" | "\b" | "\n" | "\r" | "\f" | "\\\"" | "\'" | ['\\'].
+uchar --> ['\\'], ['u'], hex, hex, hex, hex .
+uchar --> ['\\'], ['U'], hex, hex, hex, hex, hex, hex, hex .
 
+echar --> "\t" | "\b" | "\n" | "\r" | "\f" | ['\"'] | "\'" | (['\\'], "")|(['\\'], [X], {
+    dif(X, 'u'),
+    dif(X, 'U')
+}).
+
+string_literal_quote_label_ --> 
+    [X],
+    {
+        maplist(dif(X), [
+            unicode_char(X, 0x22),
+            unicode_char(X, 0x5C),
+            unicode_char(X, 0xA),
+            unicode_char(X, 0xD),
+            '"',
+            '\\'
+        ])  
+    } .
+    
 pn_chars --> pn_chars_base_u | "-" .
 pn_chars --> numeric_char.
 pn_chars --> [X],
